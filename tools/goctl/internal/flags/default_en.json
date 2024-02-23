@@ -203,7 +203,7 @@
         "branch": "{{.global.branch}}"
       },
       "yaml": {
-        "short": "Generate mysql model from yaml",
+        "short": "Generate model from yaml",
         "src": "The path or path globbing patterns of the yaml",
         "dir": "{{.goctl.model.dir}}",
         "style": "{{.global.style}}",

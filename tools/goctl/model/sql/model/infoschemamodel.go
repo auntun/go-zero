@@ -32,6 +32,8 @@ type (
 		ColumnDefault   any    `db:"COLUMN_DEFAULT"`
 		IsNullAble      string `db:"IS_NULLABLE"`
 		OrdinalPosition int    `db:"ORDINAL_POSITION"`
+		Tags            []string
+		IsOptional      bool
 	}
 
 	// DbIndex defines index of columns in information_schema.statistic

@@ -43,6 +43,8 @@ type (
 		SeqInIndex      int
 		OrdinalPosition int
 		ContainsPQ      bool
+		Tags            []string
+		IsOptional      bool
 	}
 
 	// KeyType types alias of int
@@ -368,6 +370,8 @@ func getTableFields(table *model.Table, strict bool) (map[string]*Field, error) 
 			SeqInIndex:      columnSeqInIndex,
 			OrdinalPosition: each.OrdinalPosition,
 			ContainsPQ:      containsPQ,
+			Tags:            each.Tags,
+			IsOptional:      each.IsOptional,
 		}
 		fieldM[each.Name] = field
 	}

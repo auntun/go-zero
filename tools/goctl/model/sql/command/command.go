@@ -94,6 +94,33 @@ func MysqlDDL(_ *cobra.Command, _ []string) error {
 	return fromDDL(arg)
 }
 
+func MysqlYaml(_ *cobra.Command, _ []string) error {
+	migrationnotes.BeforeCommands(VarStringDir, VarStringStyle)
+	src := VarStringSrc
+	dir := VarStringDir
+	cache := VarBoolCache
+	idea := VarBoolIdea
+	style := VarStringStyle
+	home := VarStringHome
+	remote := VarStringRemote
+	branch := VarStringBranch
+	if len(remote) > 0 {
+		repo, _ := file.CloneIntoGitHome(remote, branch)
+		if len(repo) > 0 {
+			home = repo
+		}
+	}
+	if len(home) > 0 {
+		pathx.RegisterGoctlHome(home)
+	}
+	cfg, err := config.NewConfig(style)
+	if err != nil {
+		return err
+	}
+
+	return fromYaml(src, dir, cfg, cache, idea, VarBoolStrict, mergeColumns(VarStringSliceIgnoreColumns))
+}
+
 // MySqlDataSource generates model code from datasource
 func MySqlDataSource(_ *cobra.Command, _ []string) error {
 	migrationnotes.BeforeCommands(VarStringDir, VarStringStyle)
@@ -267,6 +294,39 @@ type dataSourceArg struct {
 	cache, idea   bool
 	strict        bool
 	ignoreColumns []string
+}
+
+func fromYaml(src string, dir string, cfg *config.Config, cache, idea, strict bool, ignoreColumns []string) error {
+	log := console.NewConsole(idea)
+	if len(src) == 0 {
+		return errors.New("expected path or path globbing patterns, but nothing found")
+	}
+
+	files, err := util.MatchFiles(src)
+	if err != nil {
+		return err
+	}
+
+	if len(files) == 0 {
+		return errNotMatched
+	}
+
+	ym := model.NewYamlSchemaModel(files)
+	matchTables, err := ym.GetAllTables()
+	if err != nil {
+		return err
+	}
+
+	if len(matchTables) == 0 {
+		return errors.New("no tables matched")
+	}
+
+	generator, err := gen.NewDefaultGenerator(dir, cfg, gen.WithConsoleOption(log), gen.WithIgnoreColumns(ignoreColumns))
+	if err != nil {
+		return err
+	}
+
+	return generator.StartFromInformationSchema(matchTables, cache, strict)
 }
 
 func fromMysqlDataSource(arg dataSourceArg) error {

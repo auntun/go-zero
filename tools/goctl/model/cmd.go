@@ -11,6 +11,7 @@ var (
 	Cmd             = cobrax.NewCommand("model")
 	mysqlCmd        = cobrax.NewCommand("mysql")
 	ddlCmd          = cobrax.NewCommand("ddl", cobrax.WithRunE(command.MysqlDDL))
+	yamlCmd         = cobrax.NewCommand("yaml", cobrax.WithRunE(command.MysqlYaml))
 	datasourceCmd   = cobrax.NewCommand("datasource", cobrax.WithRunE(command.MySqlDataSource))
 	pgCmd           = cobrax.NewCommand("pg", cobrax.WithRunE(command.PostgreSqlDataSource))
 	pgDatasourceCmd = cobrax.NewCommand("datasource", cobrax.WithRunE(command.PostgreSqlDataSource))
@@ -21,6 +22,7 @@ func init() {
 	var (
 		ddlCmdFlags          = ddlCmd.Flags()
 		datasourceCmdFlags   = datasourceCmd.Flags()
+		yamlCmdFlags         = yamlCmd.Flags()
 		pgDatasourceCmdFlags = pgDatasourceCmd.Flags()
 		mongoCmdFlags        = mongoCmd.Flags()
 	)
@@ -34,6 +36,15 @@ func init() {
 	ddlCmdFlags.StringVar(&command.VarStringHome, "home")
 	ddlCmdFlags.StringVar(&command.VarStringRemote, "remote")
 	ddlCmdFlags.StringVar(&command.VarStringBranch, "branch")
+
+	yamlCmdFlags.StringVarP(&command.VarStringSrc, "src", "s")
+	yamlCmdFlags.StringVarP(&command.VarStringDir, "dir", "d")
+	yamlCmdFlags.StringVar(&command.VarStringStyle, "style")
+	yamlCmdFlags.BoolVarP(&command.VarBoolCache, "cache", "c")
+	yamlCmdFlags.BoolVar(&command.VarBoolIdea, "idea")
+	yamlCmdFlags.StringVar(&command.VarStringHome, "home")
+	yamlCmdFlags.StringVar(&command.VarStringRemote, "remote")
+	yamlCmdFlags.StringVar(&command.VarStringBranch, "branch")
 
 	datasourceCmdFlags.StringVar(&command.VarStringURL, "url")
 	datasourceCmdFlags.StringSliceVarP(&command.VarStringSliceTable, "table", "t")
@@ -72,7 +83,7 @@ func init() {
 	mysqlCmd.PersistentFlags().StringSliceVarPWithDefaultValue(&command.VarStringSliceIgnoreColumns,
 		"ignore-columns", "i", []string{"create_at", "created_at", "create_time", "update_at", "updated_at", "update_time"})
 
-	mysqlCmd.AddCommand(datasourceCmd, ddlCmd)
+	mysqlCmd.AddCommand(datasourceCmd, ddlCmd, yamlCmd)
 	pgCmd.AddCommand(pgDatasourceCmd)
 	Cmd.AddCommand(mysqlCmd, mongoCmd, pgCmd)
 }

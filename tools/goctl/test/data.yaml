@@ -1,0 +1,26 @@
+database: info
+
+tables:
+  - name: user
+    columns:
+      - name: id
+        dataType: int
+        columnType: int
+        tags:
+          - json:"id"
+        isOptional: false
+        isNullAble: string
+        indices:
+          - type: primary
+            name: id
+          - type: unique
+            name: id  
+        columnDefault: 1
+        comment: "编号"
+        extra: string
+        ordinalPosition: 1
+
+      - name: user_name
+        dataType: varchar
+        comment: "用户名"
+        ordinalPosition: 3        

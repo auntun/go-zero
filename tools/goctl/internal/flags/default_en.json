@@ -172,17 +172,6 @@
           "home": "{{.global.home}}",
           "remote": "{{.global.remote}}",
           "branch": "{{.global.branch}}"
-        },
-        "yaml": {
-          "short": "Generate mysql model from yaml",
-          "src": "The path or path globbing patterns of the yaml",
-          "dir": "{{.goctl.model.dir}}",
-          "style": "{{.global.style}}",
-          "cache": "Generate code with cache [optional]",
-          "idea": "For idea plugin [optional]",
-          "home": "{{.global.home}}",
-          "remote": "{{.global.remote}}",
-          "branch": "{{.global.branch}}"
         }
       },
       "pg": {
@@ -209,6 +198,17 @@
         "easy": "Generate code with auto generated CollectionName for easy declare [optional]",
         "dir": "{{.goctl.model.dir}}",
         "style": "{{.global.style}}",
+        "home": "{{.global.home}}",
+        "remote": "{{.global.remote}}",
+        "branch": "{{.global.branch}}"
+      },
+      "yaml": {
+        "short": "Generate mysql model from yaml",
+        "src": "The path or path globbing patterns of the yaml",
+        "dir": "{{.goctl.model.dir}}",
+        "style": "{{.global.style}}",
+        "cache": "Generate code with cache [optional]",
+        "idea": "For idea plugin [optional]",
         "home": "{{.global.home}}",
         "remote": "{{.global.remote}}",
         "branch": "{{.global.branch}}"

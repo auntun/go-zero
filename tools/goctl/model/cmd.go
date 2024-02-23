@@ -83,7 +83,7 @@ func init() {
 	mysqlCmd.PersistentFlags().StringSliceVarPWithDefaultValue(&command.VarStringSliceIgnoreColumns,
 		"ignore-columns", "i", []string{"create_at", "created_at", "create_time", "update_at", "updated_at", "update_time"})
 
-	mysqlCmd.AddCommand(datasourceCmd, ddlCmd, yamlCmd)
+	mysqlCmd.AddCommand(datasourceCmd, ddlCmd)
 	pgCmd.AddCommand(pgDatasourceCmd)
-	Cmd.AddCommand(mysqlCmd, mongoCmd, pgCmd)
+	Cmd.AddCommand(mysqlCmd, mongoCmd, pgCmd, yamlCmd)
 }

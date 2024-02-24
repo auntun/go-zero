@@ -5,6 +5,7 @@ import (
 	goformat "go/format"
 	"os"
 	"regexp"
+	"strings"
 	"text/template"
 
 	"github.com/zeromicro/go-zero/tools/goctl/internal/errorx"
@@ -55,7 +56,21 @@ func (t *DefaultTemplate) SaveTo(data any, path string, forceUpdate bool) error 
 
 // Execute returns the codes after the template executed
 func (t *DefaultTemplate) Execute(data any) (*bytes.Buffer, error) {
-	tem, err := template.New(t.name).Parse(t.text)
+	tem, err := template.New(t.name).Funcs(template.FuncMap{
+		// 驼峰命名
+		"ToCamel": func(name string, ucfirst bool) string {
+			names := strings.Split(name, "_")
+			var firstLetter string
+			for index := range names {
+				firstLetter = strings.ToUpper(string(names[index][0]))
+				if index == 0 && !ucfirst {
+					firstLetter = strings.ToLower(string(names[index][0]))
+				}
+				names[index] = firstLetter + names[index][1:]
+			}
+			return strings.Join(names, "")
+		},
+	}).Parse(t.text)
 	if err != nil {
 		return nil, errorx.Wrap(err, "template parse error:", t.text)
 	}

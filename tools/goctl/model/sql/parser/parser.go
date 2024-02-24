@@ -20,12 +20,14 @@ const timeImport = "time.Time"
 type (
 	// Table describes a mysql table
 	Table struct {
-		Name        stringx.String
-		Db          stringx.String
-		PrimaryKey  Primary
-		UniqueIndex map[string][]*Field
-		Fields      []*Field
-		ContainsPQ  bool
+		Name         stringx.String
+		Db           stringx.String
+		NameOriginal string
+		DbOriginal   string
+		PrimaryKey   Primary
+		UniqueIndex  map[string][]*Field
+		Fields       []*Field
+		ContainsPQ   bool
 	}
 
 	// Primary describes a primary key
@@ -161,11 +163,13 @@ func Parse(filename, database string, strict bool) ([]*Table, error) {
 		checkDuplicateUniqueIndex(uniqueIndex, e.Name)
 
 		list = append(list, &Table{
-			Name:        stringx.From(e.Name),
-			Db:          stringx.From(database),
-			PrimaryKey:  primaryKey,
-			UniqueIndex: uniqueIndex,
-			Fields:      fields,
+			Name:         stringx.From(e.Name),
+			NameOriginal: e.Name,
+			Db:           stringx.From(database),
+			DbOriginal:   database,
+			PrimaryKey:   primaryKey,
+			UniqueIndex:  uniqueIndex,
+			Fields:       fields,
 		})
 	}
 
@@ -279,6 +283,8 @@ func ConvertDataType(table *model.Table, strict bool) (*Table, error) {
 	reply.UniqueIndex = map[string][]*Field{}
 	reply.Name = stringx.From(table.Table)
 	reply.Db = stringx.From(table.Db)
+	reply.NameOriginal = table.Table
+	reply.DbOriginal = table.Db
 	seqInIndex := 0
 	if table.PrimaryKey.Index != nil {
 		seqInIndex = table.PrimaryKey.Index.SeqInIndex

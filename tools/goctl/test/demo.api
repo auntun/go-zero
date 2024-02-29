@@ -1,0 +1,195 @@
+syntax = "v1"
+
+type (
+	// 定义登录接口的请求体
+	UserReq {
+		PhoneNum   string `json:"phoneNum"`
+		VerifyCode string `json:"verifyCode"`
+	}
+	// 定义登录接口的响应体
+	LoginResp {
+		Id    int64  `json:"id"`
+		Name  string `json:"name"`
+		Token string `json:"token"`
+	}
+	// 定义登录接口的响应体
+	CommonResp {
+		Code    int         `json:"code"`
+		Message string      `json:"message"`
+		Data    interface{} `json:"data"`
+	}
+	// 关注请求
+	FollowReq {
+		Authorization string `header:"authorization"`
+		FollowId      int64  `json:"followId"`
+	}
+	// 关注列表，粉丝列表请求
+	UserInfoReq {
+		UserId   int64 `form:"userId"`
+		PageSize int64 `form:"pageSize,optional"`
+		PageNum  int64 `form:"pageNum,optional"`
+	}
+	UserInfo {
+		Id        int64  `json:"id"`
+		PhoneNum  string `json:"phoneNum"`
+		Name      string `json:"name"`
+		AvatarUrl string `json:"avatarUrl"`
+		IsFollow  bool   `json:"isFollow"`
+	}
+	// 粉丝列表返回
+	UserListRes {
+		UserList []UserInfo `json:"code"`
+		Count    int64      `json:"count"`
+		PageSize int64      `json:"pageSize"`
+		PageNum  int64      `json:"pageNum"`
+	}
+	// 发布blog
+	NewBlogReq {
+		Authorization string   `header:"authorization"`
+		Content       string   `json:"content"`
+		Pictures      []string `json:"pictures,optional"`
+		Title         string   `json:"title"`
+		VideoAddr     string   `json:"videoAddr,optional"`
+		VideoThumAddr string   `json:"videoThumAddr,optional"` //看这个视频缩略图怎么获取,是前端生成还是后端处理
+	}
+	// blogs列表
+	BlogPageReq {
+		Authorization string `header:"authorization,optional"`
+		Query         string `form:"query,optional"`
+		PageSize      int64  `form:"pageSize,optional"`
+		PageNum       int64  `form:"pageNum,optional"`
+	}
+	BlogInfo {
+		Id            int64    `json:"id"`
+		Title         string   `json:"title"`
+		Content       string   `json:"content"`
+		Localcation   string   `json:"localcation"`
+		Pictures      []string `json:"pictures"`
+		VideoAddr     string   `json:"videoAddr"`
+		VideoThumAddr string   `json:"videoThumAddr"`
+		ForwardCount  int64    `json:"forwardCount"`
+		CommentCount  int64    `json:"commentCount"`
+		LikeCount     int64    `json:"likeCount"`
+		CreateTime    int64    `json:"createTime"`
+		CreateUser    UserInfo `json:"createUser"`
+	}
+	// blogs列表返回
+	BlogListRes {
+		BlogList []BlogInfo `json:"blogList"`
+		Count    int64      `json:"count"`
+		PageSize int64      `json:"pageSize"`
+		PageNum  int64      `json:"pageNum"`
+	}
+	// comment列表
+	CommentPageReq {
+		Authorization string `header:"authorization,optional"`
+		Query         int64  `form:"query,optional"` //传递上级id rootid/subid/subid这种形式
+		Deep          int64  `form:"deep,optional"` //向下获取几级
+		PageSize      int64  `form:"pageSize,optional"`
+		PageNum       int64  `form:"pageNum,optional"`
+	}
+	CommentInfo {
+		Id            int64    `json:"id"`
+		PId           string   `json:"pid"`
+		VideoAddr     string   `json:"videoAddr"`
+		VideoThumAddr string   `json:"videoThumAddr"`
+		Content       string   `json:"content"`
+		Location      string   `json:"location"`
+		Pictures      []string `json:"pictures"`
+		CommentCount  int64    `json:"commentCount"`
+		CreateTime    int64    `json:"createTime"`
+		CreateUser    UserInfo `json:"createUser"`
+	}
+	// blogs列表返回
+	CommentListRes {
+		CommentList []CommentInfo `json:"commentList"`
+		Count       int64         `json:"count"`
+		PageSize    int64         `json:"pageSize"`
+		PageNum     int64         `json:"pageNum"`
+	}
+	// 发布评论
+	NewCommentReq {
+		Authorization string   `header:"authorization"`
+		Pid           int64    `json:"pid"` //上级id  rootid/subid/subid这种形式
+		Content       string   `json:"content"`
+		Pictures      []string `json:"pictures,optional"`
+		VideoAddr     string   `json:"videoAddr,optional"`
+	}
+)
+
+// 定义 HTTP 服务
+// 微服务名称为 user，生成的代码目录和配置文件将和 user 值相关
+service gateway {
+	@handler register
+	// 定义接口
+	// 请求方法为 post
+	// 路由为 /user/register
+	// 请求体为 UserReq
+	// 响应体为 CommonResp，响应体必须有 returns 关键字修饰
+	post /user/register (UserReq) returns (CommonResp)
+
+	@handler follow
+	// 定义接口
+	// 请求方法为 post
+	// 路由为 /user/follow
+	// 请求体为 FollowReq
+	// 响应体为 CommonResp，响应体必须有 returns 关键字修饰
+	post /user/follow (FollowReq) returns (CommonResp)
+
+	@handler getfollow
+	// 定义接口
+	// 请求方法为 post
+	// 路由为 /user/follow
+	// 请求体为 UserInfoReq
+	// 响应体为 CommonResp，响应体必须有 returns 关键字修饰
+	get /user/follow (UserInfoReq) returns (CommonResp)
+
+	@handler fans
+	// 定义接口
+	// 请求方法为 post
+	// 路由为 /user/fans
+	// 请求体为 UserInfoReq
+	// 响应体为 CommonResp，响应体必须有 returns 关键字修饰
+	get /user/fans (UserInfoReq) returns (CommonResp)
+
+	@handler newBlog
+	// 定义接口
+	// 请求方法为 post
+	// 路由为 /blog
+	// 请求体为 NewBlogReq
+	// 响应体为 CommonResp，响应体必须有 returns 关键字修饰
+	post /blog (NewBlogReq) returns (CommonResp)
+
+	@handler getBlog
+	// 定义接口
+	// 请求方法为 get
+	// 路由为 /blog
+	// 请求体为 BlogPageReq
+	// 响应体为 CommonResp，响应体必须有 returns 关键字修饰
+	get /blog (BlogPageReq) returns (CommonResp)
+
+	@handler getcommont
+	// 定义接口
+	// 请求方法为 get
+	// 路由为 /blog/commont
+	// 请求体为 CommentPageReq
+	// 响应体为 CommonResp，响应体必须有 returns 关键字修饰
+	get /blog/commont (CommentPageReq) returns (CommonResp)
+
+	@handler commont
+	// 定义接口
+	// 请求方法为 post
+	// 路由为 /blog/commont
+	// 请求体为 NewCommentReq
+	// 响应体为 CommonResp，响应体必须有 returns 关键字修饰
+	post /blog/commont (NewCommentReq) returns (CommonResp)
+
+	@handler reply
+	// 定义接口
+	// 请求方法为 post
+	// 路由为 /reply
+	// 请求体为 NewCommentReq
+	// 响应体为 CommonResp，响应体必须有 returns 关键字修饰
+	post /reply (NewCommentReq) returns (CommonResp)
+}
+

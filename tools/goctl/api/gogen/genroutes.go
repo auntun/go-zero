@@ -148,7 +148,7 @@ rest.WithPrefix("%s"),`, g.prefix)
 			gbuilder.WriteString("\n}...,")
 			params := g.middlewares
 			for i := range params {
-				params[i] = "serverCtx." + params[i]
+				params[i] = fmt.Sprintf("middleware.%s(serverCtx)", params[i])
 			}
 			middlewareStr := strings.Join(params, ", ")
 			routes = fmt.Sprintf("rest.WithMiddlewares(\n[]rest.Middleware{ %s }, \n %s \n),",
@@ -179,6 +179,8 @@ rest.WithPrefix("%s"),`, g.prefix)
 	filename := path.Join(dir, handlerDir, routeFilename)
 	os.Remove(filename)
 
+	routesAdditions := strings.TrimSpace(builder.String())
+
 	return genFile(fileGenConfig{
 		dir:             dir,
 		subdir:          handlerDir,
@@ -189,13 +191,13 @@ rest.WithPrefix("%s"),`, g.prefix)
 		builtinTemplate: routesTemplate,
 		data: map[string]any{
 			"hasTimeout":      hasTimeout,
-			"importPackages":  genRouteImports(rootPkg, api),
-			"routesAdditions": strings.TrimSpace(builder.String()),
+			"importPackages":  genRouteImports(rootPkg, api, strings.Contains(routesAdditions, "middleware")),
+			"routesAdditions": routesAdditions,
 		},
 	})
 }
 
-func genRouteImports(parentPkg string, api *spec.ApiSpec) string {
+func genRouteImports(parentPkg string, api *spec.ApiSpec, hasMiddleware bool) string {
 	importSet := collection.NewSet()
 	importSet.AddStr(fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, contextDir)))
 	for _, group := range api.Service.Groups {
@@ -211,6 +213,11 @@ func genRouteImports(parentPkg string, api *spec.ApiSpec) string {
 				pathx.JoinPackages(parentPkg, handlerDir, folder)))
 		}
 	}
+
+	if hasMiddleware {
+		importSet.AddStr(fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, middlewareDir)))
+	}
+
 	imports := importSet.KeysStr()
 	sort.Strings(imports)
 	projectSection := strings.Join(imports, "\n\t")
